@@ -1,0 +1,14 @@
+{
+  "_output_dir": "/home/pablo/work",
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "Pablo Piskunow",
+  "copyright_year": "2022",
+  "development_status": "Development Status :: 1 - Planning",
+  "email": "pablo.perez.piskunow@gmail.com",
+  "friendly_name": "Fermi Contours",
+  "github_user": "piskunow",
+  "license": "MIT",
+  "package_name": "fermi_contours",
+  "project_name": "fermi-contours",
+  "version": "0.0.0"
+}
