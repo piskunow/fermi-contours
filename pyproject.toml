@@ -3,7 +3,7 @@ name = "fermi-contours"
 version = "0.0.0"
 description = "Fermi Contours"
 authors = ["Pablo Piskunow <pablo.perez.piskunow@gmail.com>"]
-license = "MIT"
+license = "BSD 2-Clause License (Simplified)"
 readme = "README.md"
 homepage = "https://github.com/piskunow/fermi-contours"
 repository = "https://github.com/piskunow/fermi-contours"
@@ -18,6 +18,7 @@ Changelog = "https://github.com/piskunow/fermi-contours/releases"
 [tool.poetry.dependencies]
 python = "^3.7"
 click = ">=8.0.1"
+dparse = "^0.6.2"
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"
