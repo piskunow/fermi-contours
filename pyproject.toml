@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fermi-contours"
-version = "0.1.1a0"
+version = "0.1.1a1"
 description = "Fermi Contours"
 authors = ["Pablo Piskunow <pablo.perez.piskunow@gmail.com>"]
 license = "BSD 2-Clause License (Simplified)"
