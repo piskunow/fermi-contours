@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fermi-contours"
-version = "0.1.0"
+version = "0.1.1a0"
 description = "Fermi Contours"
 authors = ["Pablo Piskunow <pablo.perez.piskunow@gmail.com>"]
 license = "BSD 2-Clause License (Simplified)"
@@ -20,7 +20,7 @@ python = "^3.7"
 click = ">=8.0.1"
 dparse = "^0.6.2"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 Pygments = ">=2.10.0"
 black = ">=21.10b0"
 coverage = {extras = ["toml"], version = ">=6.2"}
@@ -45,6 +45,7 @@ sphinx-click = ">=3.0.2"
 typeguard = ">=2.13.3"
 xdoctest = {extras = ["colors"], version = ">=0.15.10"}
 myst-parser = {version = ">=0.16.1"}
+autopep8 = "^2.0.0"
 
 [tool.poetry.scripts]
 fermi-contours = "fermi_contours.__main__:main"
