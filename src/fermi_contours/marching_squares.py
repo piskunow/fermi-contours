@@ -12,10 +12,13 @@ https://doi.org/10.5281/zenodo.4704325
 and extended to take into account periodic boundaries and other edge-cases.
 """
 
+from typing import Any
+from typing import Callable
 from warnings import warn
+
 import numpy as np
 import numpy.typing as npt
-from typing import Any, Callable
+
 
 PairInt = tuple[int, int]
 PairFloat = tuple[float, float]
@@ -145,7 +148,7 @@ class MarchingSquares:
 
     @property
     def grid_points(self) -> tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
-        """Starting grid to find the contours."""
+        """Start grid to find the contours."""
         x1, x2 = self.bounds[0]
         y1, y2 = self.bounds[1]
         n_x, n_y = self.res
