@@ -1,11 +1,11 @@
-"""
-Copyright (C) (2022) - Pablo M Perez-Piskunow
+"""Copyright (C) (2022) - Pablo M Perez-Piskunow.
 
 Code adapted from
 
 Perez-Piskunow, Pablo M, Bovenzi, Nicandro, Akhmerov, Anton R, & Breitkreiz, Maxim. (2021).
 Code and data associated with the paper
-"Chiral Anomaly Trapped in Weyl Metals: Nonequilibrium Valley Polarization at Zero Magnetic Field"
+"Chiral Anomaly Trapped in Weyl Metals: Nonequilibrium Valley Polarization at
+Zero Magnetic Field"
 (1.0.1). Zenodo.
 https://doi.org/10.5281/zenodo.4704325
 
@@ -15,7 +15,7 @@ and extended to take into account periodic boundaries and other edge-cases.
 from warnings import warn
 import numpy as np
 import numpy.typing as npt
-from typing import Any, Callable, Set, Sequence
+from typing import Any, Callable
 
 PairInt = tuple[int, int]
 PairFloat = tuple[float, float]
@@ -69,7 +69,7 @@ class MarchingSquares:
         open_contours: bool = True,
         periodic: bool = False,
     ) -> None:
-
+        """Initialize MarchingSquares."""
         # compute the coordinates grid
         if bounds is None and grid_values is None:
             raise ValueError("Either 'bounds' or 'grid_values' must be provided.")
@@ -145,6 +145,7 @@ class MarchingSquares:
 
     @property
     def grid_points(self) -> tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
+        """Starting grid to find the contours."""
         x1, x2 = self.bounds[0]
         y1, y2 = self.bounds[1]
         n_x, n_y = self.res
@@ -153,7 +154,9 @@ class MarchingSquares:
         y_array = np.linspace(y1, y2, n_y, endpoint=endpoint, dtype=np.float_)
         return x_array, y_array
 
-    def _compute_grid_values(self) -> npt.NDArray[np.float_]:
+    def _compute_grid_values(
+        self, func: Callable[[float, float], float]
+    ) -> npt.NDArray[np.float_]:
         x_array, y_array = self.grid_points
         grid_values: npt.NDArray[np.float_] = np.ndarray(self.res, dtype=np.float_)
 
@@ -165,7 +168,7 @@ class MarchingSquares:
     def _find_contours(
         self, level: float
     ) -> tuple[list[LPInt], list[dict[PairInt, PairFloat]]]:
-        """Get the coarse grid coordinates of one contour, or set of contours
+        """Get the coarse grid coordinates of one contour, or set of contours.
 
         This is a fast version of the MarchinSquares algorithm, that uses
         the computed values of all cells simultaneously.
@@ -273,13 +276,11 @@ class MarchingSquares:
                     last_xys.append(ij)
 
                 # check if the next cell exists in the grid
-                try:
-                    i, j = ij
-                    assert i >= 0 and j >= 0
-                    _ = cells[ij]
+                i, j = ij
+                if (0 <= i < n_x) and (0 <= j < n_y):
                     single_contour.append(ij)
                     single_path[ij] = xy
-                except (IndexError, AssertionError) as err:
+                else:
                     contours_cells.append(single_contour)
                     contour_paths.append(single_path)
                     if self.open_contours:
@@ -289,7 +290,7 @@ class MarchingSquares:
                             "Contour goes outisde the bounds. "
                             "Set 'open_contours' to True if "
                             "that is the expected behavior."
-                        ) from err
+                        )
 
                 if ij == initial_point:
                     # The contour closes on itself
@@ -309,8 +310,7 @@ def marching_cell_values(
     level: float = 0.0,
     mod: PairInt | None = None,
 ) -> PairFloat:
-    """
-    Return the interpolated values where the contour crosses the new boundary.
+    """Return the interpolated values where the contour crosses the new boundary.
 
     Parameters
     ----------
@@ -320,6 +320,8 @@ def marching_cell_values(
         Direction where the marching cell is moving.
     grid_values: ndarray of shape `(n, m)`
         Values to use in the linear interpolation.
+    x_array, y_array: ndarrays of floats
+        Coordinates of the grid points.
     level : float, default to '0'
         The level of the isosurface, that is, contour in 2d.
     mod: paif of ints, optional
@@ -332,7 +334,7 @@ def marching_cell_values(
         _mod = mod
 
     def values(i: int, j: int) -> float:
-        return grid_values[i % _mod[0], j % _mod[1]]
+        return grid_values[i % _mod[0], j % _mod[1]]  # type: ignore
 
     i, j = ij
     if d_ij[0] == 1:
@@ -397,7 +399,6 @@ def marching_step(
 ) -> PairInt:
     """Return the direction to the next cell.
 
-
     The parameters `func`, `middle` and `d_ij` are only accessed
     when they are necessary to resolve saddle-point ambiguities
     (i.e. ``cell == 0b0101`` or ``cell == 0b1010``).
@@ -442,7 +443,7 @@ def marching_step(
                 new_d_ij = (0, 0)
 
             if new_d_ij == (0, 0):
-                raise RuntimeError("Inconsistent direction and cell value.")
+                raise RuntimeError("Inconsistent direction and cell value.") from err
             return new_d_ij
 
 
