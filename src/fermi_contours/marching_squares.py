@@ -96,19 +96,15 @@ class MarchingSquares:
         self.periodic = periodic
 
         # compute the grid values
-        if callable(func):
-            self.func = func
-        else:
-            if grid_values is None:
+        if grid_values is None:
+            if func is None:
                 raise ValueError(
                     "'func' must be a callable when 'grid_values' is 'None'."
                 )
-            self.func = _dummy
-        if grid_values is None:
-            self.grid_values = self._compute_grid_values()
+            self.grid_values = self._compute_grid_values(func)
         else:
             self.grid_values = np.atleast_2d(grid_values)
-
+        self.func = func
         self.open_contours = open_contours
 
     def __call__(self, level: int = 0) -> list[LPFloat]:
@@ -163,7 +159,7 @@ class MarchingSquares:
 
         for ix in range(self.res[0]):
             for iy in range(self.res[1]):
-                grid_values[ix, iy] = self.func(x_array[ix], y_array[iy])
+                grid_values[ix, iy] = func(x_array[ix], y_array[iy])
         return grid_values
 
     def _find_contours(
@@ -248,15 +244,11 @@ class MarchingSquares:
                     d_ij = marching_step(cells[ij], self.func, middle_k, d_ij)
                 except RuntimeError:
                     warn("Saddle point not resolved.")
-                    break
-                except TypeError as e:
                     if self.func is None:
                         warn(
                             "Saddle point not resolved because 'func' is not provided."
                         )
-                        break
-                    else:
-                        raise TypeError(e)
+                    break
 
                 xy = marching_cell_values(
                     ij, d_ij, self.grid_values, x_array, y_array, level, mod=mod
@@ -398,7 +390,10 @@ def marching_cell_values(
 
 
 def marching_step(
-    cell: int, func: Callable[[float, float], float], middle: PairFloat, d_ij: PairInt
+    cell: int,
+    func: Callable[[float, float], float] | None,
+    middle: PairFloat,
+    d_ij: PairInt,
 ) -> PairInt:
     """Return the direction to the next cell.
 
@@ -409,37 +404,46 @@ def marching_step(
     """
     try:
         return MARCHING_STEPS[cell]
-    except KeyError:
-        msg = "Inconsistent direction and cell values."
-        new_d_ij = None
-        if cell == 0b0101:
-            if func(*middle) < 0:
-                if d_ij == (0, 1):
-                    new_d_ij = (1, 0)
-                elif d_ij == (0, -1):
-                    new_d_ij = (-1, 0)
-                raise RuntimeError(msg)
-            else:
-                if d_ij == (0, 1):
-                    new_d_ij = (-1, 0)
-                elif d_ij == (0, -1):
-                    new_d_ij = (1, 0)
-                raise RuntimeError(msg)
-        elif cell == 0b1010:
-            if func(*middle) < 0:
-                if d_ij == (1, 0):
-                    new_d_ij = (0, -1)
-                elif d_ij == (-1, 0):
-                    new_d_ij = (0, 1)
-                raise RuntimeError(msg)
-            else:
-                if d_ij == (1, 0):
-                    new_d_ij = (0, 1)
-                elif d_ij == (-1, 0):
-                    new_d_ij = (0, -1)
-                raise RuntimeError(msg)
+    except KeyError as err:
+        if func is None:
+            raise RuntimeError(f"cell {str(cell)} shouldn't happen ...") from err
         else:
-            raise RuntimeError(f"cell {str(cell)} shouldn't happen ...")
+            if cell == 0b0101:
+                if func(*middle) < 0:
+                    if d_ij == (0, 1):
+                        new_d_ij = (1, 0)
+                    elif d_ij == (0, -1):
+                        new_d_ij = (-1, 0)
+                    else:
+                        new_d_ij = (0, 0)
+                else:
+                    if d_ij == (0, 1):
+                        new_d_ij = (-1, 0)
+                    elif d_ij == (0, -1):
+                        new_d_ij = (1, 0)
+                    else:
+                        new_d_ij = (0, 0)
+            elif cell == 0b1010:
+                if func(*middle) < 0:
+                    if d_ij == (1, 0):
+                        new_d_ij = (0, -1)
+                    elif d_ij == (-1, 0):
+                        new_d_ij = (0, 1)
+                    else:
+                        new_d_ij = (0, 0)
+                else:
+                    if d_ij == (1, 0):
+                        new_d_ij = (0, 1)
+                    elif d_ij == (-1, 0):
+                        new_d_ij = (0, -1)
+                    else:
+                        new_d_ij = (0, 0)
+            else:
+                new_d_ij = (0, 0)
+
+            if new_d_ij == (0, 0):
+                raise RuntimeError("Inconsistent direction and cell value.")
+            return new_d_ij
 
 
 # tables definition
