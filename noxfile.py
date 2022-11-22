@@ -23,7 +23,7 @@ except ImportError:
 
 
 package = "fermi_contours"
-python_versions = ["3.10", "3.9", "3.8", "3.7"]
+python_versions = ["3.10"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",
@@ -42,9 +42,6 @@ def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
     This function patches git hooks installed by pre-commit to activate the
     session's virtual environment. This allows pre-commit to locate hooks in
     that environment when invoked from git.
-
-    Args:
-        session: The Session object.
     """
     assert session.bin is not None  # noqa: S101
 
