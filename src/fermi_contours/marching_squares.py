@@ -451,9 +451,7 @@ def marching_step(
 
 
 # tables definition
-""" MARCHING_STEPS : constant dict
-    Assigns a direction to the square corner values.
-"""
+"""MARCHING_STEPS - Assigns a direction to the square corner values."""
 MARCHING_STEPS: dict[int, PairInt] = {
     0b0000: (1, 0),
     0b0001: (-1, 0),
