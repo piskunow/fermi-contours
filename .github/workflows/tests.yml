@@ -12,6 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - { python: "3.9", os: "ubuntu-latest", session: "coverage" }
           - { python: "3.9", os: "ubuntu-latest", session: "pre-commit" }
           - { python: "3.9", os: "ubuntu-latest", session: "safety" }
           - { python: "3.9", os: "ubuntu-latest", session: "mypy" }
