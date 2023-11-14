@@ -14,8 +14,9 @@ hidden:
 maxdepth: 1
 ---
 
+api
+tutorial
 usage
-reference
 contributing
 Code of Conduct <codeofconduct>
 License <license>

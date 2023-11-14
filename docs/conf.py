@@ -1,7 +1,7 @@
 """Sphinx configuration."""
 project = "Fermi Contours"
 author = "Pablo Piskunow"
-copyright = "2022, Pablo Piskunow"
+copyright = "2023, Pablo Piskunow"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
