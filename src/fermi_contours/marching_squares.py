@@ -14,6 +14,8 @@ and extended to take into account periodic boundaries and other edge-cases.
 
 from typing import Any
 from typing import Callable
+from typing import Optional
+from typing import Union
 from warnings import warn
 
 import numpy as np
@@ -65,10 +67,12 @@ class MarchingSquares:
 
     def __init__(
         self,
-        grid_values: npt.NDArray[np.float_] | None = None,
-        func: Callable[[float, float], float] | None = None,
-        bounds: tuple[PairInt, PairInt] | tuple[PairFloat, PairFloat] | None = None,
-        res: int | PairInt | None = None,
+        grid_values: Optional[npt.NDArray[np.float_]] = None,
+        func: Optional[Callable[[float, float], float]] = None,
+        bounds: Optional[
+            Union[tuple[PairInt, PairInt], tuple[PairFloat, PairFloat]]
+        ] = None,
+        res: Optional[Union[int, PairInt]] = None,
         open_contours: bool = True,
         periodic: bool = False,
     ) -> None:
@@ -311,7 +315,7 @@ def marching_cell_values(
     x_array: npt.NDArray[np.float_],
     y_array: npt.NDArray[np.float_],
     level: float = 0.0,
-    mod: PairInt | None = None,
+    mod: Optional[PairInt] = None,
 ) -> PairFloat:
     """Return the interpolated values where the contour crosses the new boundary.
 
@@ -396,7 +400,7 @@ def marching_cell_values(
 
 def marching_step(
     cell: int,
-    func: Callable[[float, float], float] | None,
+    func: Optional[Callable[[float, float], float]],
     middle: PairFloat,
     d_ij: PairInt,
 ) -> PairInt:
