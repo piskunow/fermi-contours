@@ -5,7 +5,7 @@ end-before: <!-- github-only -->
 ```
 
 [python api]: api
-[tutorial]: tutorial
+[tutorial]: fc_tutorial_1
 [command-line reference]: usage
 [contributor guide]: contributing
 [license]: license
@@ -17,7 +17,7 @@ maxdepth: 1
 ---
 
 api
-tutorial
+fc_tutorial_1
 usage
 contributing
 Code of Conduct <codeofconduct>
