@@ -58,6 +58,10 @@ autopep8 = "^2.0.0"
 ipython = "^8.6.0"
 nox = "^2023.4.22"
 nox-poetry = "^1.0.3"
+ipykernel = "^6.26.0"
+matplotlib = "^3.8.1"
+nbsphinx = "^0.9.3"
+pandoc = "^2.3"
 
 [tool.poetry.scripts]
 fermi-contours = "fermi_contours.__main__:main"
