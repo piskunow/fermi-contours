@@ -4,9 +4,11 @@ end-before: <!-- github-only -->
 ---
 ```
 
-[license]: license
-[contributor guide]: contributing
+[python api]: api
+[tutorial]: tutorial
 [command-line reference]: usage
+[contributor guide]: contributing
+[license]: license
 
 ```{toctree}
 ---
