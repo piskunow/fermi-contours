@@ -4,9 +4,11 @@ end-before: <!-- github-only -->
 ---
 ```
 
-[license]: license
-[contributor guide]: contributing
+[python api]: api
+[tutorial]: fc_tutorial_1
 [command-line reference]: usage
+[contributor guide]: contributing
+[license]: license
 
 ```{toctree}
 ---
@@ -15,7 +17,7 @@ maxdepth: 1
 ---
 
 api
-tutorial
+fc_tutorial_1
 usage
 contributing
 Code of Conduct <codeofconduct>

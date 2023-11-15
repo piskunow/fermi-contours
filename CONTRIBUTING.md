@@ -11,7 +11,7 @@ Here is a list of important resources for contributors:
 - [Issue Tracker]
 - [Code of Conduct]
 
-[mit license]: https://opensource.org/licenses/MIT
+[bsd-2-clause license]: https://opensource.org/license/bsd-2-clause/
 [source code]: https://github.com/piskunow/fermi-contours
 [documentation]: https://fermi-contours.readthedocs.io/
 [issue tracker]: https://github.com/piskunow/fermi-contours/issues

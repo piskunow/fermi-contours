@@ -92,6 +92,12 @@ jobs:
           restore-keys: |
             ${{ steps.pre-commit-cache.outputs.result }}-
 
+      - name: Install Pandoc
+        if: matrix.session == 'docs-build'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
       - name: Run Nox
         run: |
           nox --python=${{ matrix.python }}

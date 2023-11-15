@@ -2,8 +2,8 @@
 name = "fermi-contours"
 version = "0.1.0-alpha"
 description = "Fermi Contours"
-authors = ["Pablo Piskunow <pablo.perez.piskunow@gmail.com>"]
-license = "BSD 2-Clause License (Simplified)"
+authors = ["Pablo Piskunow <pablo@piskunow.com>"]
+license = "2-Clause BSD License"
 readme = "README.md"
 homepage = "https://github.com/piskunow/fermi-contours"
 repository = "https://github.com/piskunow/fermi-contours"
@@ -28,6 +28,7 @@ pygments = "^2.15.0"
 requests = "^2.31.0"
 tornado = "^6.3.2"
 urllib3 = "^1.26.17"
+nbsphinx = "^0.9.3"
 
 [tool.poetry.group.dev.dependencies]
 Pygments = ">=2.10.0"
@@ -58,6 +59,10 @@ autopep8 = "^2.0.0"
 ipython = "^8.6.0"
 nox = "^2023.4.22"
 nox-poetry = "^1.0.3"
+ipykernel = "^6.26.0"
+matplotlib = "^3.8.1"
+nbsphinx = "^0.9.3"
+pandoc = "^2.3"
 
 [tool.poetry.scripts]
 fermi-contours = "fermi_contours.__main__:main"
