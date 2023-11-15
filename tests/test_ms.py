@@ -5,7 +5,7 @@ from numpy.testing import assert_allclose
 from fermi_contours.marching_squares import MarchingSquares
 
 
-def surface(x, y):
+def surface(x: float, y: float) -> float:
     """Construct a simple surface."""
     return x**2 + y**2
 
@@ -42,7 +42,7 @@ val_contour_paths_dict = zip(val_contours_cells, val_contour_paths)
 def test_single_contour() -> None:
     """Test closed single contour."""
     squares = MarchingSquares(
-        func=surface,
+        func=surface,  # type: ignore
         res=[20, 10],  # type: ignore
         bounds=[[-2, 2], [-1, 1]],  # type: ignore
     )

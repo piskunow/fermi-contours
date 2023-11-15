@@ -102,7 +102,7 @@ class MarchingSquares:
         self.func = func
         self.open_contours = open_contours
 
-    def __call__(self, level: int = 0) -> list[LPFloat]:
+    def __call__(self, level: float = 0) -> list[LPFloat]:
         """Calcualte the Fermi contours for a Fermi level.
 
         Sets values for the attributes defined below.
@@ -117,7 +117,7 @@ class MarchingSquares:
         contour_paths: list of lists of pairs of floats.
             Each list has numerical interpolated points along the path.
         """
-        contours_cells, contour_paths = self._find_contours(level)
+        _, contour_paths = self._find_contours(level)
         return contour_paths
 
     @property
