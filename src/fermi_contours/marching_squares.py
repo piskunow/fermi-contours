@@ -118,25 +118,7 @@ class MarchingSquares:
             Each list has numerical interpolated points along the path.
         """
         contours_cells, contour_paths = self._find_contours(level)
-        # check for repeated cells and return only the largest
-        digested_contour_cells: list[Any] = []
-        digested_contour_paths: list[Any] = []
-        for c_cells, v_cells in zip(contours_cells, contour_paths):
-            # check that this does not belong to digest
-            updated = False
-            for digest, paths in zip(
-                digested_contour_cells,
-                digested_contour_paths,
-            ):
-                if not set(c_cells).isdisjoint(digest):
-                    digest.update(c_cells)
-                    updated = True
-                    paths.update(v_cells)
-            if not updated:
-                digested_contour_cells.append(set(c_cells))
-                digested_contour_paths.append(v_cells)
-
-        return [list(d.values()) for d in digested_contour_paths]
+        return contour_paths
 
     @property
     def grid_points(self) -> tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
@@ -160,9 +142,7 @@ class MarchingSquares:
                 grid_values[ix, iy] = func(x_array[ix], y_array[iy])
         return grid_values
 
-    def _find_contours(
-        self, level: float
-    ) -> tuple[list[LPInt], list[dict[PairInt, PairFloat]]]:
+    def _find_contours(self, level: float) -> tuple[list[LPInt], list[LPFloat]]:
         """Get the coarse grid coordinates of one contour, or set of contours.
 
         This is a fast version of the MarchinSquares algorithm, that uses
@@ -222,15 +202,17 @@ class MarchingSquares:
             )
 
         while xys:
-            initial_point = min(xys)  # lexicographical minimum of tuples
             single_contour: LPInt = []
-            single_path: dict[PairInt, PairFloat] = dict()
-            xys.discard(initial_point)
-            ij = initial_point
+            single_path: LPFloat = []
 
-            last_xys = []
+            initial_point = min(xys)  # lexicographical minimum of tuples
+            next_ij = initial_point
+            xys.remove(initial_point)
+
+            contour_closed = False
 
             while True:
+                ij = next_ij
                 # make sure we went through all the indices in the contour
                 i, j = ij
                 middle_k = (
@@ -251,30 +233,45 @@ class MarchingSquares:
                 xy = marching_cell_values(
                     ij, d_ij, self.grid_values, x_array, y_array, level, mod=mod
                 )
-                i, j = np.array(ij, dtype=int) + d_ij
                 if mod is not None:
-                    i = (i + mod[0]) % mod[0]
-                    j = (j + mod[1]) % mod[1]
                     _x, _y = xy
                     _x = origin[0] + (_x - origin[0] + periods[0]) % periods[0]
                     _y = origin[1] + (_y - origin[1] + periods[1]) % periods[1]
                     xy = (_x, _y)
 
-                ij = (i, j)
+                # check if the next cell exists in the grid
+                # prepare starting point for next step
+                next_i, next_j = np.array(ij, dtype=int) + d_ij
+                if mod is not None:
+                    next_i, next_j = (next_i + mod[0]) % mod[0], (
+                        next_j + mod[1]
+                    ) % mod[1]
+                next_ij = (next_i, next_j)
+
+                # add cell and contour point
+                single_contour.append(ij)
+                single_path.append(xy)
 
                 try:
                     xys.remove(ij)
                 except KeyError:
-                    warn(f"Stepping outside the initial path with cell {ij}.")
-                    if ij in last_xys:
-                        break
-                    last_xys.append(ij)
+                    # import pdb; pdb.set_trace()
+                    if ij == initial_point:
+                        # The contour closes on itself
+                        if self.open_contours and not contour_closed:
+                            # add again the point initial point to close the contour
+                            # but only once
+                            # xys.add(ij)
+                            contour_closed = True
+                        else:
+                            contours_cells.append(single_contour)
+                            contour_paths.append(single_path)
+                            break
+                    else:
+                        warn(f"Stepping outside the initial path with cell {ij}.")
 
-                # check if the next cell exists in the grid
-                i, j = ij
-                if (0 <= i < n_x) and (0 <= j < n_y):
-                    single_contour.append(ij)
-                    single_path[ij] = xy
+                if (0 <= next_i < n_x) and (0 <= next_j < n_y):
+                    pass
                 else:
                     contours_cells.append(single_contour)
                     contour_paths.append(single_path)
@@ -287,13 +284,28 @@ class MarchingSquares:
                             "that is the expected behavior."
                         )
 
-                if ij == initial_point:
-                    # The contour closes on itself
-                    contours_cells.append(single_contour)
-                    contour_paths.append(single_path)
-                    break
-
         return contours_cells, contour_paths
+
+    def _check_repeated(self, contours_cells, contour_paths):
+        # check for repeated cells and return only the largest
+        digested_contour_cells: list[Any] = []
+        digested_contour_paths: list[Any] = []
+        for c_cells, v_cells in zip(contours_cells, contour_paths):
+            # check that this does not belong to digest
+            updated = False
+            for digest, paths in zip(
+                digested_contour_cells,
+                digested_contour_paths,
+            ):
+                if not set(c_cells).isdisjoint(digest):
+                    digest.update(c_cells)
+                    updated = True
+                    paths.update(v_cells)
+            if not updated:
+                digested_contour_cells.append(set(c_cells))
+                digested_contour_paths.append(v_cells)
+
+        return [list(d.values()) for d in digested_contour_paths]
 
 
 def marching_cell_values(

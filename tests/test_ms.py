@@ -52,5 +52,5 @@ def test_single_contour() -> None:
     contour = squares(level=level)[0]
 
     assert_allclose(contours_cells[0], val_contours_cells)
-    assert_allclose(list(contour_paths[0].values()), contour)
+    assert_allclose(contour_paths[0], contour)
     assert_allclose(val_contour_paths, contour)
