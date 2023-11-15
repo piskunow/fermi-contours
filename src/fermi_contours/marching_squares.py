@@ -114,7 +114,7 @@ class MarchingSquares:
 
         Returns
         -------
-        contour_paths: list of lists of contours.
+        contour_paths: list of lists of pairs of floats.
             Each list has numerical interpolated points along the path.
         """
         contours_cells, contour_paths = self._find_contours(level)

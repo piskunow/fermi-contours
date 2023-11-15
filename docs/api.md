@@ -1,8 +1,8 @@
 # Python API
 
 ```{eval-rst}
-.. automodule:: fermi_contours.marching_squares
-   :members:
+.. autoclass:: fermi_contours.marching_squares.MarchingSquares
+   :members: __call__
    :undoc-members:
    :show-inheritance:
 ```
