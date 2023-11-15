@@ -1,16 +1,4 @@
-"""Copyright (C) (2022) - Pablo M Perez-Piskunow.
-
-Code adapted from
-
-Perez-Piskunow, Pablo M, Bovenzi, Nicandro, Akhmerov, Anton R, & Breitkreiz, Maxim. (2021).
-Code and data associated with the paper
-"Chiral Anomaly Trapped in Weyl Metals: Nonequilibrium Valley Polarization at
-Zero Magnetic Field"
-(1.0.1). Zenodo.
-https://doi.org/10.5281/zenodo.4704325
-
-and extended to take into account periodic boundaries and other edge-cases.
-"""
+"""Marching Squares module."""
 
 from typing import Any
 from typing import Callable
@@ -126,7 +114,7 @@ class MarchingSquares:
 
         Returns
         -------
-        contour_paths: list of lists of contours.
+        contour_paths: list of lists of pairs of floats.
             Each list has numerical interpolated points along the path.
         """
         contours_cells, contour_paths = self._find_contours(level)

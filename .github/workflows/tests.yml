@@ -1,7 +1,6 @@
 name: Tests
 
 on:
-  - push
   - pull_request
 
 jobs:
@@ -92,6 +91,12 @@ jobs:
           key: ${{ steps.pre-commit-cache.outputs.result }}-${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
             ${{ steps.pre-commit-cache.outputs.result }}-
+
+      - name: Install Pandoc
+        if: matrix.session == 'docs-build'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
 
       - name: Run Nox
         run: |
