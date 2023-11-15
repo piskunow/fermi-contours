@@ -290,7 +290,9 @@ class MarchingSquares:
 
         return contours_cells, contour_paths
 
-    def _check_repeated(self, contours_cells, contour_paths):
+    def _check_repeated(
+        self, contours_cells: list[LPInt], contour_paths: list[LPFloat]
+    ) -> list[LPFloat]:
         # check for repeated cells and return only the largest
         digested_contour_cells: list[Any] = []
         digested_contour_paths: list[Any] = []
