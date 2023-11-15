@@ -42,9 +42,9 @@ val_contour_paths_dict = zip(val_contours_cells, val_contour_paths)
 def test_single_contour() -> None:
     """Test closed single contour."""
     squares = MarchingSquares(
-        func=surface,  # type: ignore
-        res=[20, 10],  # type: ignore
-        bounds=[[-2, 2], [-1, 1]],  # type: ignore
+        func=surface,
+        res=(20, 10),  # type: ignore
+        bounds=((-2, 2), (-1, 1)),  # type: ignore
     )
 
     contours_cells, contour_paths = squares._find_contours(level=level)
