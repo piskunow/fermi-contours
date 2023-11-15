@@ -155,7 +155,7 @@ class MarchingSquares:
         """
         # start with a particular cell (needed for later, so that the
         # refinement works easily)
-        n_x, n_y = self.res
+        n_x, n_y = self.res[0] - 1, self.res[1] - 1
         x_array, y_array = self.grid_points
 
         # construct binary grid of 0's and 1's regions
@@ -176,9 +176,7 @@ class MarchingSquares:
         roll_xy = np.logical_or(roll_x, roll_y)
         # the indices of the region contours are the `xys`
         xys = {
-            (x, y)
-            for (x, y) in np.argwhere(roll_xy)
-            if np.all((x, y) < (n_x - 1, n_y - 1))
+            (x, y) for (x, y) in np.argwhere(roll_xy) if np.all((x, y) < (n_x, n_y))
         }  # filter last indices
 
         contours_cells = []
@@ -215,10 +213,13 @@ class MarchingSquares:
                 ij = next_ij
                 # make sure we went through all the indices in the contour
                 i, j = ij
-                middle_k = (
-                    (x_array[i] + x_array[i + 1]) / 2,
-                    (y_array[j] + y_array[j + 1]) / 2,
-                )
+                try:
+                    middle_k = (
+                        (x_array[i] + x_array[i + 1]) / 2,
+                        (y_array[j] + y_array[j + 1]) / 2,
+                    )
+                except IndexError:
+                    middle_k = None
 
                 try:
                     d_ij = marching_step(cells[ij], self.func, middle_k, d_ij)
@@ -228,6 +229,9 @@ class MarchingSquares:
                         warn(
                             "Saddle point not resolved because 'func' is not provided."
                         )
+                    break
+                except IndexError:
+                    # starting point already at the edge
                     break
 
                 xy = marching_cell_values(
@@ -401,8 +405,8 @@ def marching_cell_values(
 def marching_step(
     cell: int,
     func: Optional[Callable[[float, float], float]],
-    middle: PairFloat,
-    d_ij: PairInt,
+    middle: Optional[PairFloat],
+    d_ij: Optional[PairInt],
 ) -> PairInt:
     """Return the direction to the next cell.
 
@@ -417,6 +421,8 @@ def marching_step(
             raise RuntimeError(f"cell {str(cell)} shouldn't happen ...") from err
         else:
             if cell == 0b0101:
+                if middle is None:
+                    raise RuntimeError("Next step outside grid.") from err
                 if func(*middle) < 0:
                     if d_ij == (0, 1):
                         new_d_ij = (1, 0)
@@ -432,6 +438,8 @@ def marching_step(
                     else:
                         new_d_ij = (0, 0)
             elif cell == 0b1010:
+                if middle is None:
+                    raise RuntimeError("Next step outside grid.") from err
                 if func(*middle) < 0:
                     if d_ij == (1, 0):
                         new_d_ij = (0, -1)
