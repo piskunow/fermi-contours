@@ -2,8 +2,8 @@
 name = "fermi-contours"
 version = "0.1.0-alpha"
 description = "Fermi Contours"
-authors = ["Pablo Piskunow <pablo.perez.piskunow@gmail.com>"]
-license = "BSD 2-Clause License (Simplified)"
+authors = ["Pablo Piskunow <pablo@piskunow.com>"]
+license = "2-Clause BSD License"
 readme = "README.md"
 homepage = "https://github.com/piskunow/fermi-contours"
 repository = "https://github.com/piskunow/fermi-contours"
