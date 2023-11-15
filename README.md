@@ -19,13 +19,22 @@
 [pre-commit]: https://github.com/pre-commit/pre-commit
 [black]: https://github.com/psf/black
 
-## Features
+## Reference
 
-- TODO
+Code adapted from
+
+Perez-Piskunow, Pablo M, Bovenzi, Nicandro, Akhmerov, Anton R, & Breitkreiz, Maxim. (2021).
+Code and data associated with the paper
+"Chiral Anomaly Trapped in Weyl Metals: Nonequilibrium Valley Polarization at
+Zero Magnetic Field"
+(1.0.1). Zenodo.
+[https://doi.org/10.5281/zenodo.4704325](https://doi.org/10.5281/zenodo.4704325)
+
+and extended to take into account periodic boundaries and other edge-cases.
 
 ## Requirements
 
-- TODO
+- Python >=3.9
 
 ## Installation
 
