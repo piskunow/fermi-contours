@@ -296,21 +296,21 @@ class MarchingSquares:
     ) -> tuple[list[LPInt], list[LPFloat]]:
         # open contours may start several times, prune them to keep the largest
         # for each path
-        pruned_path_list = []
-        pruned_cell_list = []
+        pruned_cell_list: list[LPInt] = []
+        pruned_path_list: list[LPFloat] = []
         for contour, path in zip(contours_cells, contour_paths):
             # replace subsets in pruned list
             for idx, pruned_path in enumerate(pruned_path_list):
                 if set(path).issuperset(pruned_path):
-                    pruned_path_list[idx] = path
                     pruned_cell_list[idx] = contour
+                    pruned_path_list[idx] = path
             # add missing sets from the pruned list
             is_subset = any(
                 set(path).issubset(pruned_path) for pruned_path in pruned_path_list
             )
             if not is_subset:
-                pruned_path_list.append(path)
                 pruned_cell_list.append(contour)
+                pruned_path_list.append(path)
 
         return pruned_cell_list, pruned_path_list
 
