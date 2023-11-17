@@ -1,10 +1,8 @@
 """Marching Squares module."""
-
-from typing import Any
+import logging
 from typing import Callable
 from typing import Optional
 from typing import Union
-from warnings import warn
 
 import numpy as np
 import numpy.typing as npt
@@ -117,8 +115,9 @@ class MarchingSquares:
         contour_paths: list of lists of pairs of floats.
             Each list has numerical interpolated points along the path.
         """
-        _, contour_paths = self._find_contours(level)
-        return contour_paths
+        contour_cells, contour_paths = self._find_contours(level)
+        _, pruned_paths = self._check_repeated(contour_cells, contour_paths)
+        return pruned_paths
 
     @property
     def grid_points(self) -> tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
@@ -224,9 +223,9 @@ class MarchingSquares:
                 try:
                     d_ij = marching_step(cells[ij], self.func, middle_k, d_ij)
                 except RuntimeError:
-                    warn("Saddle point not resolved.")
+                    logging.debug("Saddle point not resolved.")
                     if self.func is None:
-                        warn(
+                        logging.debug(
                             "Saddle point not resolved because 'func' is not provided."
                         )
                     break
@@ -272,7 +271,9 @@ class MarchingSquares:
                             contour_paths.append(single_path)
                             break
                     else:
-                        warn(f"Stepping outside the initial path with cell {ij}.")
+                        logging.debug(
+                            "Stepping outside the initial path with cell %s", ij
+                        )
 
                 if (0 <= next_i < n_x) and (0 <= next_j < n_y):
                     pass
@@ -292,26 +293,26 @@ class MarchingSquares:
 
     def _check_repeated(
         self, contours_cells: list[LPInt], contour_paths: list[LPFloat]
-    ) -> list[LPFloat]:
-        # check for repeated cells and return only the largest
-        digested_contour_cells: list[Any] = []
-        digested_contour_paths: list[Any] = []
-        for c_cells, v_cells in zip(contours_cells, contour_paths):
-            # check that this does not belong to digest
-            updated = False
-            for digest, paths in zip(
-                digested_contour_cells,
-                digested_contour_paths,
-            ):
-                if not set(c_cells).isdisjoint(digest):
-                    digest.update(c_cells)
-                    updated = True
-                    paths.update(v_cells)
-            if not updated:
-                digested_contour_cells.append(set(c_cells))
-                digested_contour_paths.append(v_cells)
+    ) -> tuple[list[LPInt], list[LPFloat]]:
+        # open contours may start several times, prune them to keep the largest
+        # for each path
+        pruned_cell_list: list[LPInt] = []
+        pruned_path_list: list[LPFloat] = []
+        for contour, path in zip(contours_cells, contour_paths):
+            # replace subsets in pruned list
+            for idx, pruned_path in enumerate(pruned_path_list):
+                if set(path).issuperset(pruned_path):
+                    pruned_cell_list[idx] = contour
+                    pruned_path_list[idx] = path
+            # add missing sets from the pruned list
+            is_subset = any(
+                set(path).issubset(pruned_path) for pruned_path in pruned_path_list
+            )
+            if not is_subset:
+                pruned_cell_list.append(contour)
+                pruned_path_list.append(path)
 
-        return [list(d.values()) for d in digested_contour_paths]
+        return pruned_cell_list, pruned_path_list
 
 
 def marching_cell_values(
