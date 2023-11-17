@@ -1,6 +1,5 @@
 """Marching Squares module."""
 
-from typing import Any
 from typing import Callable
 from typing import Optional
 from typing import Union
@@ -117,8 +116,9 @@ class MarchingSquares:
         contour_paths: list of lists of pairs of floats.
             Each list has numerical interpolated points along the path.
         """
-        _, contour_paths = self._find_contours(level)
-        return contour_paths
+        contour_cells, contour_paths = self._find_contours(level)
+        _, pruned_paths = self._check_repeated(contour_cells, contour_paths)
+        return pruned_paths
 
     @property
     def grid_points(self) -> tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
@@ -292,26 +292,26 @@ class MarchingSquares:
 
     def _check_repeated(
         self, contours_cells: list[LPInt], contour_paths: list[LPFloat]
-    ) -> list[LPFloat]:
-        # check for repeated cells and return only the largest
-        digested_contour_cells: list[Any] = []
-        digested_contour_paths: list[Any] = []
-        for c_cells, v_cells in zip(contours_cells, contour_paths):
-            # check that this does not belong to digest
-            updated = False
-            for digest, paths in zip(
-                digested_contour_cells,
-                digested_contour_paths,
-            ):
-                if not set(c_cells).isdisjoint(digest):
-                    digest.update(c_cells)
-                    updated = True
-                    paths.update(v_cells)
-            if not updated:
-                digested_contour_cells.append(set(c_cells))
-                digested_contour_paths.append(v_cells)
+    ) -> tuple[list[LPInt], list[LPFloat]]:
+        # open contours may start several times, prune them to keep the largest
+        # for each path
+        pruned_path_list = []
+        pruned_cell_list = []
+        for contour, path in zip(contours_cells, contour_paths):
+            # replace subsets in pruned list
+            for idx, pruned_path in enumerate(pruned_path_list):
+                if set(path).issuperset(pruned_path):
+                    pruned_path_list[idx] = path
+                    pruned_cell_list[idx] = contour
+            # add missing sets from the pruned list
+            is_subset = any(
+                set(path).issubset(pruned_path) for pruned_path in pruned_path_list
+            )
+            if not is_subset:
+                pruned_path_list.append(path)
+                pruned_cell_list.append(contour)
 
-        return [list(d.values()) for d in digested_contour_paths]
+        return pruned_cell_list, pruned_path_list
 
 
 def marching_cell_values(
