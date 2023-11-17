@@ -1,9 +1,8 @@
 """Marching Squares module."""
-
+import logging
 from typing import Callable
 from typing import Optional
 from typing import Union
-from warnings import warn
 
 import numpy as np
 import numpy.typing as npt
@@ -224,9 +223,9 @@ class MarchingSquares:
                 try:
                     d_ij = marching_step(cells[ij], self.func, middle_k, d_ij)
                 except RuntimeError:
-                    warn("Saddle point not resolved.")
+                    logging.debug("Saddle point not resolved.")
                     if self.func is None:
-                        warn(
+                        logging.debug(
                             "Saddle point not resolved because 'func' is not provided."
                         )
                     break
@@ -272,7 +271,9 @@ class MarchingSquares:
                             contour_paths.append(single_path)
                             break
                     else:
-                        warn(f"Stepping outside the initial path with cell {ij}.")
+                        logging.debug(
+                            "Stepping outside the initial path with cell %s", ij
+                        )
 
                 if (0 <= next_i < n_x) and (0 <= next_j < n_y):
                     pass
