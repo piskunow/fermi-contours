@@ -32,6 +32,7 @@ nox.options.sessions = (
     "tests",
     "typeguard",
     "xdoctest",
+    "docs-requirements",
     "docs-build",
 )
 
@@ -205,6 +206,27 @@ def xdoctest(session: Session) -> None:
     session.install(".")
     session.install("xdoctest[colors]")
     session.run("python", "-m", "xdoctest", *args)
+
+
+@nox.session(name="docs-requirements", python=python_versions[0])
+def docs_requirements(session: nox.Session) -> None:
+    """Check that docs/requirements.txt resolves on the Read the Docs interpreter.
+
+    Read the Docs is the only consumer of that file; the docs-build session
+    resolves Sphinx from the lock instead. Without this check, a pin needing a
+    newer Python than .readthedocs.yml provides passes every CI job and only
+    fails after merge, on Read the Docs.
+    """
+    session.run(
+        "python",
+        "-m",
+        "pip",
+        "install",
+        "--dry-run",
+        "--ignore-installed",
+        "--requirement",
+        "docs/requirements.txt",
+    )
 
 
 @session(name="docs-build", python=python_versions[0])
