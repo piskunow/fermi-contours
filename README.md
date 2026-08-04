@@ -34,7 +34,7 @@ and extended to take into account periodic boundaries and other edge-cases.
 
 ## Requirements
 
-- Python >=3.9
+- Python >=3.11
 
 ## Installation
 
