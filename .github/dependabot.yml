@@ -1,21 +1,36 @@
 version: 2
 updates:
+  # Weekly + grouped on purpose: four ecosystems on a daily cadence produced a
+  # constant stream of single-dependency PRs. Security advisories are still
+  # raised immediately regardless of this schedule.
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]
   - package-ecosystem: pip
     directory: "/.github/workflows"
     schedule:
-      interval: daily
+      interval: weekly
+    groups:
+      ci-tooling:
+        patterns: ["*"]
   - package-ecosystem: pip
     directory: "/docs"
     schedule:
-      interval: daily
+      interval: weekly
+    groups:
+      docs:
+        patterns: ["*"]
   - package-ecosystem: pip
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
     versioning-strategy: lockfile-only
     allow:
       - dependency-type: "all"
+    groups:
+      python-dependencies:
+        patterns: ["*"]
