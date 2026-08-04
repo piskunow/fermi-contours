@@ -59,6 +59,9 @@ jobs:
       - name: Install Poetry
         run: |
           pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+          # Poetry 2.x moved `poetry export` out of core, and nox-poetry calls it
+          # for every session.install.
+          pipx inject poetry poetry-plugin-export
           poetry --version
 
       - name: Install Nox
@@ -138,6 +141,9 @@ jobs:
       - name: Install Poetry
         run: |
           pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+          # Poetry 2.x moved `poetry export` out of core, and nox-poetry calls it
+          # for every session.install.
+          pipx inject poetry poetry-plugin-export
           poetry --version
 
       - name: Install Nox
