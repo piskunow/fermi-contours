@@ -1,12 +1,10 @@
 """Marching Squares module."""
+
 import logging
-from typing import Callable
-from typing import Optional
-from typing import Union
+from collections.abc import Callable
 
 import numpy as np
 import numpy.typing as npt
-
 
 PairInt = tuple[int, int]
 PairFloat = tuple[float, float]
@@ -53,12 +51,10 @@ class MarchingSquares:
 
     def __init__(
         self,
-        grid_values: Optional[npt.NDArray[np.float_]] = None,
-        func: Optional[Callable[[float, float], float]] = None,
-        bounds: Optional[
-            Union[tuple[PairInt, PairInt], tuple[PairFloat, PairFloat]]
-        ] = None,
-        res: Optional[Union[int, PairInt]] = None,
+        grid_values: npt.NDArray[np.float64] | None = None,
+        func: Callable[[float, float], float] | None = None,
+        bounds: tuple[PairInt, PairInt] | tuple[PairFloat, PairFloat] | None = None,
+        res: int | PairInt | None = None,
         open_contours: bool = True,
         periodic: bool = False,
     ) -> None:
@@ -120,21 +116,21 @@ class MarchingSquares:
         return pruned_paths
 
     @property
-    def grid_points(self) -> tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
+    def grid_points(self) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
         """Start grid to find the contours."""
         x1, x2 = self.bounds[0]
         y1, y2 = self.bounds[1]
         n_x, n_y = self.res
         endpoint = not self.periodic
-        x_array = np.linspace(x1, x2, n_x, endpoint=endpoint, dtype=np.float_)
-        y_array = np.linspace(y1, y2, n_y, endpoint=endpoint, dtype=np.float_)
+        x_array = np.linspace(x1, x2, n_x, endpoint=endpoint, dtype=np.float64)
+        y_array = np.linspace(y1, y2, n_y, endpoint=endpoint, dtype=np.float64)
         return x_array, y_array
 
     def _compute_grid_values(
         self, func: Callable[[float, float], float]
-    ) -> npt.NDArray[np.float_]:
+    ) -> npt.NDArray[np.float64]:
         x_array, y_array = self.grid_points
-        grid_values: npt.NDArray[np.float_] = np.ndarray(self.res, dtype=np.float_)
+        grid_values: npt.NDArray[np.float64] = np.ndarray(self.res, dtype=np.float64)
 
         for ix in range(self.res[0]):
             for iy in range(self.res[1]):
@@ -174,8 +170,12 @@ class MarchingSquares:
         # find the union of x-shifts and y-shifts
         roll_xy = np.logical_or(roll_x, roll_y)
         # the indices of the region contours are the `xys`
+        # `np.argwhere` yields `np.int64`, which is not a Python `int`; convert at
+        # this boundary so the `PairInt` annotations downstream stay truthful.
         xys = {
-            (x, y) for (x, y) in np.argwhere(roll_xy) if np.all((x, y) < (n_x, n_y))
+            (int(x), int(y))
+            for (x, y) in np.argwhere(roll_xy)
+            if np.all((x, y) < (n_x, n_y))
         }  # filter last indices
 
         contours_cells = []
@@ -221,7 +221,7 @@ class MarchingSquares:
                     middle_k = None
 
                 try:
-                    d_ij = marching_step(cells[ij], self.func, middle_k, d_ij)
+                    d_ij = marching_step(int(cells[ij]), self.func, middle_k, d_ij)
                 except RuntimeError:
                     logging.debug("Saddle point not resolved.")
                     if self.func is None:
@@ -249,7 +249,7 @@ class MarchingSquares:
                     next_i, next_j = (next_i + mod[0]) % mod[0], (
                         next_j + mod[1]
                     ) % mod[1]
-                next_ij = (next_i, next_j)
+                next_ij = (int(next_i), int(next_j))
 
                 # add cell and contour point
                 single_contour.append(ij)
@@ -298,7 +298,7 @@ class MarchingSquares:
         # for each path
         pruned_cell_list: list[LPInt] = []
         pruned_path_list: list[LPFloat] = []
-        for contour, path in zip(contours_cells, contour_paths):
+        for contour, path in zip(contours_cells, contour_paths, strict=True):
             # replace subsets in pruned list
             for idx, pruned_path in enumerate(pruned_path_list):
                 if set(path).issuperset(pruned_path):
@@ -318,11 +318,11 @@ class MarchingSquares:
 def marching_cell_values(
     ij: PairInt,
     d_ij: PairInt,
-    grid_values: npt.NDArray[np.float_],
-    x_array: npt.NDArray[np.float_],
-    y_array: npt.NDArray[np.float_],
+    grid_values: npt.NDArray[np.float64],
+    x_array: npt.NDArray[np.float64],
+    y_array: npt.NDArray[np.float64],
     level: float = 0.0,
-    mod: Optional[PairInt] = None,
+    mod: PairInt | None = None,
 ) -> PairFloat:
     """Return the interpolated values where the contour crosses the new boundary.
 
@@ -407,9 +407,9 @@ def marching_cell_values(
 
 def marching_step(
     cell: int,
-    func: Optional[Callable[[float, float], float]],
-    middle: Optional[PairFloat],
-    d_ij: Optional[PairInt],
+    func: Callable[[float, float], float] | None,
+    middle: PairFloat | None,
+    d_ij: PairInt | None,
 ) -> PairInt:
     """Return the direction to the next cell.
 
