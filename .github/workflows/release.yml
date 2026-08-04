@@ -75,5 +75,8 @@ jobs:
         with:
           publish: ${{ steps.check-version.outputs.tag != '' }}
           tag: ${{ steps.check-version.outputs.tag }}
+          # Without an explicit name (and with no name-template in
+          # release-drafter.yml) releases are published with an empty title.
+          name: ${{ steps.check-version.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
