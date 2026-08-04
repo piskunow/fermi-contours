@@ -1,4 +1,5 @@
 """Nox sessions."""
+
 import os
 import shlex
 import shutil
@@ -7,7 +8,6 @@ from pathlib import Path
 from textwrap import dedent
 
 import nox
-
 
 try:
     from nox_poetry import Session
@@ -23,11 +23,11 @@ except ImportError:
 
 
 package = "fermi_contours"
-python_versions = ["3.9", "3.10", "3.11"]
+python_versions = ["3.11", "3.12", "3.13"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",
-    "safety",
+    "audit",
     "mypy",
     "tests",
     "typeguard",
@@ -136,11 +136,16 @@ def precommit(session: Session) -> None:
 
 
 @session(python=python_versions[0])
-def safety(session: Session) -> None:
-    """Scan dependencies for insecure packages."""
+def audit(session: Session) -> None:
+    """Scan dependencies for known vulnerabilities."""
     requirements = session.poetry.export_requirements()
-    session.install("safety")
-    session.run("safety", "check", "--full-report", f"--file={requirements}")
+    session.install("pip-audit")
+    session.run(
+        "pip-audit",
+        f"--requirement={requirements}",
+        "--strict",
+        "--progress-spinner=off",
+    )
 
 
 @session(python=python_versions)
@@ -210,7 +215,15 @@ def docs_build(session: Session) -> None:
         args.insert(0, "--color")
 
     session.install(".")
-    session.install("sphinx", "sphinx-click", "furo", "myst-parser")
+    session.install(
+        "sphinx",
+        "sphinx-click",
+        "furo",
+        "myst-parser",
+        "nbsphinx",
+        "ipykernel",
+        "matplotlib",
+    )
 
     build_dir = Path("docs", "_build")
     if build_dir.exists():
@@ -231,7 +244,8 @@ def docs(session: Session) -> None:
         "furo",
         "myst-parser",
         "nbsphinx",
-        "pandoc",
+        "ipykernel",
+        "matplotlib",
     )
 
     build_dir = Path("docs", "_build")
