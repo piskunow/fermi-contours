@@ -25,7 +25,7 @@ except ImportError:
 package = "fermi_contours"
 python_versions = ["3.11", "3.12", "3.13"]
 nox.needs_version = ">= 2021.6.6"
-nox.options.sessions = (
+nox.options.sessions = [
     "pre-commit",
     "audit",
     "mypy",
@@ -33,7 +33,7 @@ nox.options.sessions = (
     "typeguard",
     "xdoctest",
     "docs-build",
-)
+]
 
 
 def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
