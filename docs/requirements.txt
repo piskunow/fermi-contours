@@ -10,5 +10,5 @@ sphinx==9.0.4
 sphinx-click==6.2.0
 myst_parser==5.1.0
 nbsphinx==0.9.8
-ipykernel==7.3.0
+ipykernel==7.4.0
 matplotlib==3.11.2
