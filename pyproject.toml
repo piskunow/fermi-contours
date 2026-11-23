@@ -22,7 +22,7 @@ Changelog = "https://github.com/piskunow/fermi-contours/releases"
 # actually imports -- anything added here is imposed on every downstream user
 # and pulls that package's advisory surface into this project.
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11.5,<4.0"
 click = ">=8.1.7"
 numpy = ">=1.26,<3"
 

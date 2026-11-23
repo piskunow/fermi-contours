@@ -8,7 +8,7 @@
 furo==2025.12.19
 sphinx==9.0.4
 sphinx-click==6.2.0
-myst_parser==5.1.0
+myst_parser==5.2.0
 nbsphinx==0.9.8
 ipykernel==7.4.0
 matplotlib==3.11.2
